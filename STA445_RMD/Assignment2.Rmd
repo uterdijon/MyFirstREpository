@@ -1,0 +1,186 @@
+---
+title: "Assignment 2"
+author: "Evan Z-G"
+date: "2023-10-10"
+output: pdf_document
+---
+
+## 1.a.
+
+```{r setup, include=FALSE}
+library(tidyverse)
+```
+
+```{r}
+
+# define function duniform:
+duniform <- function(x,a,b){
+  if( a<=x &  x<=b ){  
+    density <- 1/(b-a)
+  }else{
+    density <- 0
+  }
+  return(density)
+}
+
+# test function duniform:
+duniform(4,2,5)
+
+```
+## 1.b.
+
+```{r}
+# define function duniform:
+duniform <- function(x,a,b){
+  output <- NULL
+  for( i in (1:length(x)) ){
+    if( a<=x[i] & x[i]<=b ){  
+      output[i] <- 1/(b-a)
+    }
+    else{
+      output[i] <- 0
+    }
+  }
+return(output)
+}
+
+# test function duniform:
+data.frame( x=seq(-1, 12, by=.001) ) %>%
+  mutate( y = duniform(x, 4, 8) ) %>%
+  ggplot( aes(x=x, y=y) ) +
+  geom_step()
+```
+
+## 1.c.
+
+```{r}
+library(microbenchmark)
+microbenchmark::microbenchmark( duniform( seq(-4,12,by=.0001), 4, 8), times=100)
+
+```
+
+## 1.d.
+
+```{r}
+
+# define function duniform:
+duniform <- function(x,a,b){
+  output <- NULL
+    output <- ifelse( (a<=x & x<=b), 1/(b-a), 0 )
+return(output)
+}
+
+# test function duniform:
+data.frame( x=seq(-1, 12, by=.001) ) %>%
+  mutate( y = duniform(x, 4, 8) ) %>%
+  ggplot( aes(x=x, y=y) ) +
+  geom_step()
+
+library(microbenchmark)
+microbenchmark::microbenchmark( duniform( seq(-4,12,by=.0001), 4, 8), times=100)
+
+```
+The second version was easier to write, however the first version was faster.
+
+
+## 2. 
+
+```{r}
+
+# define function duniform:
+duniform <- function(x,a=0,b=1){
+  output <- NULL
+    output <- ifelse( (a<=x & x<=b), 1/(b-a), 0 )
+return(output)
+}
+
+# test function duniform:
+data.frame( x=seq(-1, 12, by=.001) ) %>%
+  mutate( y = duniform(x) ) %>%
+  ggplot( aes(x=x, y=y) ) +
+  geom_step()
+
+library(microbenchmark)
+microbenchmark::microbenchmark( duniform( seq(-4,12,by=.0001)), times=100)
+
+```
+
+## 3.
+
+
+
+```{r}
+
+# define function standardize:
+standardize <- function(x){
+  output <- NULL
+  for (i in 1:length(x)){
+    output[i] <- (x[i] - mean(x)) / sd(x)
+  }
+  return(output)
+}
+
+data( 'iris' )
+# Graph the pre-transformed data.
+ggplot(iris, aes(x=Sepal.Length, y=Sepal.Width, color=Species)) +
+  geom_point() +
+  labs(title='Pre-Transformation')
+
+# Standardize all of the numeric columns
+# across() selects columns and applies a function to them
+# there column select requires a dplyr column select command such
+# as starts_with(), contains(), or where().  The where() command
+# allows us to use some logical function on the column to decide
+# if the function should be applied or not.
+iris.z <- iris %>% mutate( across(where(is.numeric), standardize) )
+
+# Graph the post-transformed data.
+ggplot(iris.z, aes(x=Sepal.Length, y=Sepal.Width, color=Species)) +
+  geom_point() +
+  labs(title='Post-Transformation')
+```
+
+## 4.
+
+```{r}
+fizzBuzz <- function(n){
+  output = ""
+  for (i in 1:n){
+    if (i %% 3 == 0 & i %% 5 == 0){
+      output <- paste(output, "Fizz Buzz")
+    }
+    else if (i %% 3 == 0){
+      output <- paste(output, "Fizz")
+    }
+    else if (i %% 5 == 0){
+      output <- paste(output, "Buzz")
+    }
+    else {
+      output <- paste(output, as.character(i))
+    }
+  }
+  return(output)
+  }
+
+fizzBuzz(15)
+
+```
+
+## 5.
+
+```{r}
+myFill <- function(x){
+  new_vect = c()
+  for( i in (1:length(x)) ){
+    if (is.na(x[i])){
+      new_vect[i] <- new_vect[i-1]
+    }
+    else {new_vect[i] <- x[i]
+    }
+  }
+  return(new_vect)
+}
+
+test.vector <- c('A',NA,NA, 'B','C', NA,NA,NA)
+myFill(test.vector)
+```

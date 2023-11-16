@@ -1,0 +1,222 @@
+---
+title: "Assignment_4"
+author: "Evan Z-G"
+date: "2023-10-26"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(tidyverse)
+```
+
+
+A common task is to take a set of data that has multiple categorical variables and create a table of the number of cases for each combination. An introductory statistics textbook contains a dataset summarizing student surveys from several sections of an intro class. The two variables of interest for us are Gender and Year which are the students gender and year in college.
+
+Download the dataset and correctly order the Year variable using the following:
+
+Survey <- read.csv('https://www.lock5stat.com/datasets3e/StudentSurvey.csv', na.strings=c('',' ')) 
+Using some combination of dplyr functions, produce a data set with eight rows that contains the number of responses for each gender:year combination. Make sure your table orders the Year variable in the correct order of First Year, Sophmore, Junior, and then Senior. You might want to look at the following functions: dplyr::count and dplyr::drop_na.
+
+Using tidyr commands, produce a table of the number of responses in the following form:
+
+Gender	First Year	Sophmore	Junior	Senior
+Female				
+Male				
+```{r}
+Survey <- read.csv('https://www.lock5stat.com/datasets3e/StudentSurvey.csv', na.strings=c('',' '))
+
+head(Survey)
+
+
+finaltable <- Survey %>% 
+  drop_na() %>%
+  mutate(Year = factor(Year, levels=c('FirstYear', 'Sophomore', 'Junior', 'Senior')) ) %>% count(Year, Sex, name = "Year_Sex")
+
+lasttable <-finaltable %>% pivot_wider(names_from = Year, values_from = Year_Sex)
+
+
+lasttable
+
+
+
+
+```
+
+
+
+2a.
+
+```{r}
+
+Temps <- read.csv('https://raw.githubusercontent.com/dereksonderegger/444/master/data-raw/FlagMaxTemp.csv', na.strings=c('',' '))
+
+Temps2 <- Temps %>% select(-X) %>% filter(Year == 2005) %>% pivot_longer(!Year:Month, names_to = "Dates", values_to = "Temp")
+
+Temps3 <- mutate(Temps2, Tempr = as.numeric(Temp)) 
+
+
+
+Temps3$Dates <- str_remove(Temps3$Dates,"X")
+
+
+Temps5 <- Temps3 %>% mutate(Day=
+make_date(year=Year, month = Month, day = Dates))
+
+ggplot(Temps5, aes(x=Day,y=Tempr)) +
+  geom_line()
+                 
+
+```
+
+
+
+```{r}
+Temps <- read.csv('https://raw.githubusercontent.com/dereksonderegger/444/master/data-raw/FlagMaxTemp.csv', na.strings=c('',' '))
+
+
+
+
+Temps2 <- sapply(Temps, as.numeric)
+Temps3 <- as.data.frame(Temps2)
+
+
+
+Temps4 <- pivot_longer(Temps3,X1:X31,names_to="Days", values_to = "Temp")
+Temps4
+
+Temps5 <-Temps4 %>% group_by(Year, Month)
+Temps5
+
+
+Temps6 <- Temps5 %>% filter(Year>2012 & Year<2016)
+Temps6
+
+Temps7 <- Temps6 %>% drop_na() %>% summarise(monthmean = mean(Temp))
+Temps7
+
+Temps8 <- Temps7 %>% mutate(Monthy=
+make_date(year=Year, month = Month, day = 1))
+
+
+ggplot(Temps8, aes(x=Monthy,y=monthmean)) +
+  geom_line()
+                 
+
+```
+
+
+
+
+For this problem we will consider two simple data sets.
+
+
+Squish the data frames together to generate a data set with three rows and three columns. Do two ways: first using cbind and then using one of the dplyr join commands.
+It turns out that Alice also has a pet guinea pig. Add another row to the B data set. Do this using either the base function rbind, or either of the dplyr functions add_row or bind_rows.
+Squish the A and B data sets together to generate a data set with four rows and three columns. Do this two ways: first using cbind and then using one of the dplyr join commands. Which was easier to program? Which is more likely to have an error.
+
+
+```{r}
+A <- tribble(
+  ~Name, ~Car,
+  'Alice', 'Ford F150',
+  'Bob',   'Tesla Model III',
+  'Charlie', 'VW Bug')
+
+B <- tribble(
+  ~First.Name, ~Pet,
+  'Bob',  'Cat',
+  'Charlie', 'Dog',
+  'Alice', 'Rabbit')
+
+
+Squish <- cbind(A,B$Pet)
+Squish
+
+by <- join_by(Name == First.Name)
+MyTable <- full_join(A, B, by)
+MyTable
+
+
+C <- bind_rows(B, tibble(First.Name ='Alice', Pet='Guinea Pig'))
+
+C
+
+Table4 <- cbind(A,C$Pet)
+Table4
+
+
+
+MyTable1 <- full_join(A, C, by = c('Name' = 'First.Name'))
+MyTable1
+
+
+```
+
+
+
+
+
+
+```{r}
+
+Customers <- tribble(
+  ~PersonID, ~Name, ~Street, ~City, ~State,
+  1, 'Derek Sonderegger',  '231 River Run', 'Flagstaff', 'AZ',
+  2, 'Aubrey Sonderegger', '231 River Run', 'Flagstaff', 'AZ',
+  3, 'Robert Buscaglia', '754 Forest Heights', 'Flagstaff', 'AZ',
+  4, 'Roy St Laurent', '845 Elk View', 'Flagstaff', 'AZ')
+
+Retailers <- tribble(
+  ~RetailID, ~Name, ~Street, ~City, ~State,
+  1, 'Kickstand Kafe', '719 N Humphreys St', 'Flagstaff', 'AZ',
+  2, 'MartAnnes', '112 E Route 66', 'Flagstaff', 'AZ',
+  3, 'REI', '323 S Windsor Ln', 'Flagstaff', 'AZ' )
+
+Cards <- tribble(
+  ~CardID, ~PersonID, ~Issue_DateTime, ~Exp_DateTime,
+  '9876768717278723',  1,  '2019-9-20 0:00:00', '2022-9-20 0:00:00',
+  '5628927579821287',  2,  '2019-9-20 0:00:00', '2022-9-20 0:00:00',
+  '7295825498122734',  3,  '2019-9-28 0:00:00', '2022-9-28 0:00:00',
+  '8723768965231926',  4,  '2019-9-30 0:00:00', '2022-9-30 0:00:00' ) 
+
+Transactions <- tribble(
+  ~CardID, ~RetailID, ~DateTime, ~Amount,
+  '9876768717278723', 1, '2019-10-1 8:31:23',    5.68,
+  '7295825498122734', 2, '2019-10-1 12:45:45',  25.67,
+  '9876768717278723', 1, '2019-10-2 8:26:31',    5.68,
+  '9876768717278723', 1, '2019-10-2 8:30:09',    9.23,
+  '5628927579821287', 3, '2019-10-5 18:58:57',  68.54,
+  '7295825498122734', 2, '2019-10-5 12:39:26',  31.84,
+  '8723768965231926', 2, '2019-10-10 19:02:20', 42.83) 
+
+Cards <- Cards %>% 
+  mutate( Issue_DateTime = lubridate::ymd_hms(Issue_DateTime),
+          Exp_DateTime   = lubridate::ymd_hms(Exp_DateTime) )
+Transactions <- Transactions %>% 
+  mutate( DateTime = lubridate::ymd_hms(DateTime))
+
+
+
+Table1 <- full_join(Transactions,Cards, by='CardID')
+Table2 <- full_join(Table1, Retailers, by='RetailID')
+Table3 <- full_join(Table2, Customers, by='PersonID')
+Table3
+
+
+Table4 <- filter(Table3, Name.y=='Derek Sonderegger')
+Table4
+personID <- Customers[Customers$Name == 'Aubrey Sonderegger', ]['PersonID'][[1]]
+
+personID
+  
+cardID <- filter(Cards, Cards$PersonID == personID)['CardID']
+cardID
+
+Cards
+row_no <- row_number(filter(Cards, Cards$PersonID == personID))
+row_no
+
+Cards
+```

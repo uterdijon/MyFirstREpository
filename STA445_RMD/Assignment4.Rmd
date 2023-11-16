@@ -1,0 +1,80 @@
+---
+title: "Assignment_4"
+author: "Evan Z-G"
+date: "2023-09-14"
+output: pdf_document
+---
+
+
+```{r}
+suppressPackageStartupMessages({
+  library(tidyverse, quietly = TRUE)    # loading ggplot2 and dplyr
+})
+data(ChickWeight)
+```
+
+# 1.
+## c) Only include observations from day 10 or 20:
+
+```{r}
+ChickWeight %>%
+filter(Time == 10 | Time == 20) %>%
+head()
+
+```
+## d) Group by diet and calculate mean and sd for each:
+
+```{r}
+ChickWeight %>%
+filter(Time == 10 | Time == 20) %>%
+group_by(Diet, Time) %>%
+summarise(mean = mean(weight), sd = sd(weight))
+```
+
+
+
+## 2.
+```{r}
+Body <- read.csv('http://www.openintro.org/stat/data/bdims.csv')
+```
+
+## b) Create new column for sex:
+```{r}
+Body %>%
+mutate(sex.MF = if_else(sex == 1, 'Male', 'Female')) %>%
+head()
+```
+
+## c)
+```{r}
+Body %>%
+mutate(sex.MF = if_else(sex == 1, 'Male', 'Female')) %>%
+mutate(BMI = wgt/(hgt^2)) %>%
+head()
+```
+
+## d)
+```{r}
+Body %>%
+mutate(sex.MF = if_else(sex == 1, 'Male', 'Female')) %>%
+mutate(BMI = wgt/((hgt/100)^2)) %>%
+head()
+```
+
+## e)
+```{r}
+Body %>%
+mutate(sex.MF = if_else(sex == 1, 'Male', 'Female')) %>%
+mutate(BMI = wgt/((hgt/100)^2)) %>%
+mutate(Age.Grp = cut(age, breaks =c(10,20,30,40,50,60,70), right=FALSE)) %>%
+head()
+```
+
+## f)
+```{r}
+Body %>% mutate(sex.MF = if_else(sex == 1, 'Male', 'Female')) %>%
+mutate(BMI = wgt/((hgt/100)^2)) %>%
+mutate(Age.Grp = cut(age, breaks =c(10,20,30,40,50,60,70), right=FALSE)) %>%
+group_by(sex.MF, Age.Grp) %>%
+summarise(mean = mean(BMI))
+```

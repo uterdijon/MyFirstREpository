@@ -1,0 +1,202 @@
+---
+title: 'STA 445 Exam #1'
+author: "Evan Zelezny-Green"
+date: "`r format(Sys.time(),  '%B %d, %Y')`"
+output: pdf_document
+---
+
+```{r, include=FALSE, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE}
+### Here are suggested libraries, you may load others if you wish.
+library(readxl)
+library(tidyverse)
+library(lubridate)
+```
+
+# Exam Questions
+
+## Question 1 [30 points]
+
+You will be asked to produce two functions. The first (`vecsummary`) will create a summary output for a given numerical vector.  The second (`mean_split`) will provide ABOVE/BELOW strings depending on if the element in the vector is above or below the mean of the vector.  Please answer each sub question below.
+
+**a.** For some data to analyze with your functions, load the data set `cars` from base R. The `cars` set contains two variables, `speed` and `dist`, of which there are $50$ total observations.
+
+```{r}
+data("cars")
+
+```
+
+**b.** Produce the function `vecsummary`. The function should accept as an input a numerical vector and return a data.frame with columns `Size`, `Min`, `Max`, `Min.Max`, `Mean`, in that order. The size here refers to the number of elements (`length`) in the vector. The element `Min.Max` is the ratio `Min / Max`. The function should return a data.frame with proper labels for each column, in the order specified above..
+
+```{r}
+
+vecsummary <- function(myvec){
+  
+  
+  summary <- data.frame(
+  Size = length(myvec),
+  Min = min(myvec),
+  Max = max(myvec),
+  Min.Max = min(myvec)/max(myvec),
+  Mean = mean(myvec)
+    )
+  return(summary)}
+
+```
+
+**c.** Demonstrate that the `vecsummary` function works properly by displaying the results of your function when analyzing the variable `speed` within the `cars` object.
+
+```{r}
+vecsummary(cars$speed)
+```
+
+**d.** Produce the function `mean_split`. The function should accept as an input a numerical vector and return a vector of ABOVE/BELOW determined for each element being above or below the mean value of the vector.
+
+```{r}
+mean_split <- function(myvec){
+  
+  mean <- mean(myvec)
+  resvec <- c()
+  for( index in myvec ){
+    if( index > mean ){
+      resvec <- resvec <- c(resvec,"ABOVE")
+    }else{
+      resvec <- resvec <- c(resvec, "BELOW")
+    }
+  
+  }
+  
+  return(resvec)}
+
+```
+
+**e.** Demonstrate that the `mean_split` function works properly by displaying the results of your function when analyzing the variable `dist` within the `cars` object.
+
+```{r}
+mean_split(cars$dist)
+```
+
+
+
+## Question 2 [20 points]
+
+In the area marked as `???` write a regular expression that accomplishes the requested task. Use the `strings` object to demonstrate your answer is correct by giving a minimum of two TRUE and two FALSE responses.
+
+**a.** An expression that can determine if a string contains any of the following words: `Captain`, `Chief`, `Colonel`, `Cadet`, `Cook`.
+
+```{r, eval=TRUE}
+### Change to eval=TRUE or remove eval option
+strings <- c('Captain', 'Chief', 'Colonel', 'Crew', 'Crowsnest')
+data.frame( string = strings ) %>%
+  mutate( result = str_detect(string, '(Captain|Chief|Colonel|Cadet|Cook)') )
+```
+
+**b.** An expression that can determine if a string begins with 2 of any upper or lowercase letter followed by any digit 4 times.
+
+```{r, eval=FALSE}
+### Change to eval=TRUE or remove eval option
+strings <- c('Ab1234', '1876d', 'QQ6789', 'QQ22')
+data.frame( string = strings ) %>%
+  mutate( result = str_detect(string, '[a-zA-Z]{2}\\d{4}') )
+```
+
+**c.** An expression that can determine if a string begins with `bar` or ends in `foo`.
+
+```{r, eval=FALSE}
+### Change to eval=TRUE or remove eval option
+strings <- c('barfoo', 'bardofoo', 'dofoobar', 'barfoodo')
+data.frame( string = strings ) %>%
+  mutate( result = str_detect(string, '^bar.*foo$') )
+```
+
+## Question 3 [15 points]
+
+**a.** Traveling to `Europe/Rome`, you are told that your flight will arrive at 2:00 PM local time on June 15th, 2024.  Create the object `Rome.Arrival` for this time stamp, be sure to include the timezone. Display the object to screen.
+
+```{r}
+Rome.Arrival <- mdy_hm('6-15-2024 14:00', tz='Europe/Rome') # US mountain time
+Rome.Arrival
+```
+
+**b.** You want to make a call back to the USA when you arrive.  What time will it be in `US/Arizona` when you arrive in Rome?  Return/display the results of an R calculation here.
+
+```{r}
+At.Home <- with_tz(Rome.Arrival, tzone = 'US/Arizona')
+At.Home
+```
+
+**c.** You are set to return to the USA on August 10th, 2024 at 10:00 PM (Arizona).  Assuming all of these dates/times are not delayed, how many __days__ will you be traveling? (Return a calculated time object that displays days, hours, minutes, seconds).
+
+```{r}
+Return.Home <- mdy_hm('8-10-2024 22:00', tz='US/Arizona')
+
+
+Traveling <- interval(Rome.Arrival, Return.Home)
+
+Time.Away <- as.period(Traveling, unit = 'days') 
+Time.Away
+```
+
+## Question 4 [25 points]
+
+The `Exam1_Data_F23.xlsx` file contains data developed across multiple trips (`ID`) where information was collected for four different `Sites` at four different `Periods`. Two measurements were taken for each observations and were recorded as `X` and `Y`. There are potentially many observations of the same `Period` and `Site`. The data was collected across two trips that are available in the `Exam1_Data.xlsx` file on Sheets 2 and 3.
+
+**a.** Read in the two different data sets on Sheets 2 and 3. Combine the data into a single data frame named `Q4data`. There should be 5 columns: `ID`, `Site`, `Period`, `X`, `Y`, totaling 100 observations. Demonstrate this by returning to screen the structure of the `Q4data` object. This can be done using the `str()` function. Do __not__ display any of the data.frames in your final answer, only the structure of the combined data frame (a tibble is acceptable).
+
+```{r}
+Sheet2 <- read_excel('C:/Users/esz8/AppData/Local/Downloads/Exam1_Data_F23.xlsx', sheet='Sheet2')  
+Sheet3 <- read_excel('C:/Users/esz8/AppData/Local/Downloads/Exam1_Data_F23.xlsx', sheet='Sheet3')
+
+data2 <- data.frame(
+  ID  = Sheet2$ID,
+  Site = Sheet2$Site,
+  Period =Sheet2$Period,
+  X = Sheet2$X,
+  Y = Sheet2$Y
+
+)
+
+
+data3 <- data.frame(
+  ID  = Sheet3$ID,
+  Site = Sheet3$Site,
+  Period =Sheet3$Period,
+  X = Sheet3$X,
+  Y = Sheet3$Y
+
+)
+
+
+Q4data <- rbind(data2, data3)
+
+
+
+head(Q4data)
+```
+
+**b.** We are interested in counting the number of `Site` and `Period` combinations.  Create a `wide` table that has the `Period` as columns, the `Site` as rows, and the counts for each pair within the table.
+
+```{r}
+
+#NewTable <- Q4data %>% select(ID,Site,Period) %>% group_by(Period, Site)
+
+#NewTable2 <- NewTable %>% pivot_wider(names_from = Period, values_from = ID)
+
+
+
+#NewTable2
+
+```
+
+**c.** Finally, we want to make a visual assessment of the total `X` and total `Y` observed across the four different observation sets `ID`.  Group the data by `Site` and `Period` and summarize the total `X` and total `Y` found for each combination.  Save this as a new data.frame `plotme` and display the `head`. *Hint: Finding the total requires we take the sum.*
+
+```{r}
+#plotme <- Q4data %>% group_by(Site, Period) %>% mutate( mutate( CountX = tally(Q4data$X) ))
+
+#plotme
+```
+
+**d.** Use the data.frame `plotme` to view the total X against the total Y as a scatter graph, and color the scatter based on the `Site`. 
+
+```{r}
+
+```

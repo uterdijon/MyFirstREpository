@@ -1,0 +1,19 @@
+---
+title: "Chapter_7"
+author: "Evan Z-G"
+date: "2023-09-19"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+
+library(Lock5Data)
+library(ggplot2)
+```
+
+```{r fig.dim=c(10,8)}
+data(FloridaLakes)
+my_plot <- ggplot(data=FloridaLakes, aes(x=AvgMercury, y=Lake)) + geom_col() +
+theme(axis.text.x = element_text(angle = 90, hjust = 1))
+my_plot
+```

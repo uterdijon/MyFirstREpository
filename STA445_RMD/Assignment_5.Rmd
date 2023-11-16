@@ -1,0 +1,232 @@
+---
+title: "Assignment_5"
+author: "Evan Z-G"
+date: "2023-09-21"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+suppressPackageStartupMessages({
+  library(tidyverse, quietly = TRUE)   # loading ggplot2 and dplyr
+})
+options(tibble.width = Inf)   # Print all the columns of a tibble (data.frame)
+```
+
+
+Chapter 5, Problem 2
+Create two scatter plots of gestational length and birth weight, one for each smoking status
+
+```{r}
+library(faraway)
+data(phbirths)
+#smoker <- phbirths %>%
+#  group_by(smoke)
+#smoke_yes <- filter(phbirths, smoke == TRUE)
+#smoke_no <- filter(phbirths, smoke == FALSE)
+ggplot(phbirths, aes(x=grams, y=gestate)) +
+  geom_point() +
+  facet_grid(cols = vars(smoke))
+  
+  
+  #labs(x="Birth Weight (grams)", y="Gestational Length (weeks)")
+
+```
+
+
+Remove all the observations that are premature (less than 36 weeks). For the remainder of the problem, only use these full-term babies.
+
+```{r}
+
+mature <- phbirths %>% filter(., gestate > 35) 
+
+ggplot(mature, aes(y=grams, x=gestate)) +
+  geom_point() +
+  facet_grid(cols = vars(smoke))
+head(mature)
+```
+
+
+Fit the quadratic model
+
+```{r}
+model <- lm(grams ~ poly(gestate,2) * smoke, data=mature)
+summary(model)
+```
+
+
+Add the model fitted values to the phbirths data frame along with the regression model confidence intervals.
+
+```{r}
+
+mature <- mature %>%
+  dplyr::select( -matches('fit'), -matches('lwr'), -matches('upr') ) %>%
+  cbind( predict(model, newdata=., interval='confidence') )
+
+head(mature)
+
+
+```
+
+
+On your two scatter plots from part (a), add layers for the model fits and ribbon of uncertainty for the model fits.
+
+```{r}
+  ggplot(mature, aes(y=grams, x=gestate)) +
+  geom_point() +
+  facet_grid(cols = vars(smoke)) +
+  geom_line( aes(y=fit) ) +
+  geom_ribbon( aes( ymin=lwr, ymax=upr), alpha=.3 )
+```
+
+Create a column for the residuals in the phbirths data set using any of the following:
+
+```{r}
+mature$residuals = resid(model)
+
+```
+
+
+Create a histogram of the residuals.
+
+```{r}
+ggplot(mature, aes(x=residuals)) +
+  geom_histogram() 
+  
+```
+
+Chapter 6, Problem 2:
+
+
+a.
+```{r}
+a <- 4
+b <- 10
+x <- runif(n=1, 0,10)  # one random value between 0 and 10 
+
+if( x < a ){
+  result <- 0     # Replace ???? with something appropriate!
+}else if( x <= b ){
+  result <- 1/(b-a)
+}else{
+  result <- 0
+}
+print(paste('x=',round(x,digits=3), '  result=', round(result,digits=3)))
+```
+
+
+b. i.
+```{r}
+x <- runif(n=1, 0,10)  # one random value between 0 and 10 
+if( (a<=x) & (x<=b) ){
+  result <- 1/(b-a)
+}else{
+  result <- 0
+}
+print(paste('x=',round(x,digits=3), '  result=', round(result,digits=3)))
+```
+
+
+b. ii.
+```{r}
+x <- runif(n=1, 0,10)  # one random value between 0 and 10 
+if( (x<a) | (b<x) ){
+  result <- 0
+}else{
+  result <- 1/(b-a)
+}
+print(paste('x=',round(x,digits=3), '  result=', round(result,digits=3)))
+
+```
+b. iii.
+```{r}
+x <- runif(n=1, 0,10)  # one random value between 0 and 10 
+result <- ifelse( a<=x & x<=b, 1/(b-a), 0 )
+print(paste('x=',round(x,digits=3), '  result=', round(result,digits=3)))
+```
+
+
+
+3.a.
+```{r}
+library(ggplot2)
+N <- 1000
+df <- 2
+x.grid <- seq(-3, 3, length=N)
+data <- data.frame( 
+  x = c(x.grid, x.grid),
+  y = c(dnorm(x.grid), dt(x.grid, df)),
+  type = c( rep('Normal',N), rep('T',N) ) )
+
+
+
+for ( df in 2:30 ){
+  # print out current value of df
+  print( paste("In loop and df is now:", df) )  
+
+
+  # make a nice graph
+  myplot <- ggplot(data, aes(x=x, y=y, color=type, linetype=type)) +
+  geom_line() +
+  labs(title = paste('Std Normal vs t with', df, 'degrees of freedom'))
+
+  # actually print the nice graph we made
+  print(myplot)
+  }
+```
+
+3. b.
+
+
+```{r}
+library(ggplot2)
+N <- 1000
+df <- 2
+x.grid <- seq(-3, 3, length=N)
+data <- data.frame( 
+  x = c(x.grid, x.grid),
+  y = c(dnorm(x.grid), dt(x.grid, df)),
+  type = c( rep('Normal',N), rep('T',N) ) )
+
+
+for( df in c(2,3,4,5,10,15,20,25,30) ){
+  # print out current value of df
+  print( paste("In loop and df is now:", df) )  
+
+  # make a nice graph
+  myplot <- ggplot(data, aes(x=x, y=y, color=type, linetype=type)) +
+  geom_line() +
+  labs(title = paste('Std Normal vs t with', df, 'degrees of freedom'))
+
+  # actually print the nice graph we made
+  print(myplot)
+  }
+```
+
+4. a.
+
+We can simulate rolling two 6-sided dice using the sample() function with the replace=TRUE option. Read the help file on sample() to see how to sample from the numbers 
+
+```{r}
+throw <- sample(1:6, size=2, replace = TRUE, prob = NULL)
+
+throw
+str(throw)
+```
+4. b.
+
+
+
+
+```{r}
+throws <- NULL
+print(throws)
+for( i in 1:24 ){
+  throws[i] <- sample(1:6, size=2, replace = TRUE, prob = NULL) %>% sum()
+print(throws[i])
+game <- any( throws == 12 ) # Gives a TRUE/FALSE value
+}
+throws
+print(game)
+```
+
+

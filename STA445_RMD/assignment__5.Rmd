@@ -1,0 +1,131 @@
+---
+title: "Chapter_14"
+author: "Evan Z-G"
+date: "2023-11-09"
+output: pdf_document
+---
+
+```{r}
+library(tidyverse)
+library(readr)
+library(RSQLite)
+library(DBI)         # DataBase Interface Package
+library(dbplyr)      # dplyr with databases!
+library(ggplot2)
+library(cowplot)
+library(ggrepel)
+```
+
+a.
+```{r}
+library(faraway)
+data(infmort)
+head(infmort)
+
+mytable <- infmort %>% mutate(country = rownames(infmort))
+mytable
+```
+
+b.
+```{r}
+ggplot(infmort, aes(x=mortality, y=log10(income))) +
+  geom_point() +
+  facet_wrap( . ~region )
+```
+
+
+c.
+
+```{r}
+library(cowplot)
+cowplot::plot_grid(
+  ggplot(infmort, aes(x=income, y=mortality)) +
+    geom_point() +
+    scale_y_log10(breaks=c(10,100,500),
+                  minor=c(1:10,
+ 
+                        seq(10,100,by=10))) +
+    ylab('Income (1000s of dollars)') +
+    
+     scale_x_log10(breaks=c(1,10,100,1000,5000),
+                  minor=c(1:10,
+                 
+    seq(10,5000,by=100))) +
+    xlab('Deaths per 1000 births') +
+    
+    facet_wrap( . ~region )
+    
+) 
+
+```
+
+d. The package ggrepel contains functions geom_text_repel() and geom_label_repel() that mimic the basic geom_text() and geom_label() functions in ggplot2, but work to make sure the labels don’t overlap. Select 10-15 countries to label and do so using the geom_text_repel() function.
+
+
+`
+```{r}
+library(ggrepel)
+library(cowplot)
+
+countries <- mytable %>% mutate(country2= ifelse(str_detect(country, "R"),country,NA))
+countries
+
+
+plot5 <- ggplot(countries, aes(x=income, y=mortality, label=country2) ) +
+    geom_point() +
+    scale_y_log10(breaks=c(10,100,500),
+                  minor=c(1:10,
+ 
+                        seq(10,100,by=10))) +
+    ylab('Income (1000s of dollars)') +
+    
+     scale_x_log10(breaks=c(1,10,100,1000,5000),
+                  minor=c(1:10,
+                 
+    seq(10,5000,by=100))) +
+    xlab('Deaths per 1000 births') 
+  
+plot5
+
+plot6 <- plot5 + geom_text_repel() + labs(title='test') 
+
+    
+plot6
+
+
+
+
+
+
+
+
+
+
+```
+
+
+```{r}
+library(faraway)
+data(infmort)
+head(infmort)
+```
+
+
+
+```{r}
+library(datasets)
+data(trees)
+
+model <- lm( trees$Volume ~ trees$Height) 
+
+
+
+
+summary(model)
+
+treeplot <- trees %>% ggplot(aes(x=Height, y=Volume, label=Girth) ) +
+    geom_point()
+
+treeplot
+        
+```

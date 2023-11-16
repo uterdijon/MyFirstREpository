@@ -1,0 +1,251 @@
+---
+title: "Chapter_8"
+author: "Evan Z-G"
+date: "2023-10-03"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readxl)
+```
+
+# Chapter 8 Exercises
+\vspace{2cm}
+
+## 1. Create a vector of three elements (2,4,6) and name that vector vec_a. Create a second vector, vec_b, that contains (8,10,12). Add these two vectors together and name the result vec_c.
+\vspace{2cm}
+
+
+```{r}
+vec_a <- c(2,3,6)
+vec_b <- c(8,10,12)
+vec_c <- vec_a + vec_b
+vec_c
+
+```
+\vspace{2cm}
+
+## 2. Create a vector, named vec_d, that contains only two elements (14,20). Add this vector to vec_a. What is the result and what do you think R did (look up the recycling rule using Google)? What is the warning message that R gives you?
+\vspace{2cm}
+
+
+```{r}
+vec_d <- c(14,20)
+vec_a + vec_d
+
+```
+\vspace{2cm}
+## R ran out of elements in vec_d so it repeated the sequence, thus adding 14 to 6. It gave me the warning message "longer object length is not a multiple of shorter object length"
+\vspace{2cm}
+
+
+## 3. Next add 5 to the vector vec_a. What is the result and what did R do? Why doesn’t in give you a warning message similar to what you saw in the previous problem?
+
+\vspace{2cm}
+
+```{r}
+vec_a + 5
+```
+\vspace{2cm}
+
+## 5 is not a vector so there is no error; R just adds it to each element in the vector.
+
+\vspace{2cm}
+
+## 4. Generate the vector of integers 1-5 in two different ways.
+
+a.First using the seq() function
+b.Using the a:b shortcut.
+
+\vspace{2cm}
+
+```{r}
+vec_e <- c(seq(1,5))
+vec_e
+vec_f <- c(1:5)
+vec_f
+```
+
+\vspace{2cm}
+
+## 5. Generate the vector of even numbers 2-20/ 
+
+a.Using the seq() function and
+b.Using the a:b shortcut and some subsequent algebra. Hint: Generate the vector 1-10 and then multiple it by 2.
+
+\vspace{2cm}
+
+```{r}
+vec_g <- c(seq(2,20,2))
+vec_g
+vec_h <- c(1:10) *2
+vec_h
+```
+
+\vspace{2cm}
+
+## 6. Generate a vector of 21 elements that are evenly placed between 0 and 1 using the seq() command and name this vector x.
+
+\vspace{2cm}
+
+```{r}
+x <- c(seq(0, 1, length.out=21))
+x
+```
+
+\vspace{2cm}
+
+## 7. Generate the vector  using the rep() command to replicate the vector c(2,4,8).
+
+\vspace{2cm}
+
+```{r}
+vec_z <- c(rep(c(2,4,8),times=3))
+vec_z
+```
+
+\vspace{2cm}
+
+## Generate the vector using the rep() command. You might need to check the help file for rep() to see all of the options that rep() will accept. In particular, look at the optional argument each=.
+
+\vspace{2cm}
+
+```{r}
+vec_z <- c(rep(c(2,4,8),each=3))
+vec_z
+```
+
+\vspace{2cm}
+
+## 10.In this problem, we will work with the matrix
+
+a.Create the matrix in two ways and save the resulting matrix as M.
+ii. Create the matrix using some combination of the seq() and matrix() commands.
+\vspace{2cm}
+
+
+```{r}
+M <- matrix( c(seq(2,30,2)), ncol=5, byrow=TRUE )
+M
+```
+
+\vspace{2cm}
+
+ii. Create the same matrix by some combination of multiple seq() commands and either the rbind() or cbind() command.
+
+\vspace{2cm}
+
+```{r}
+v1 <- seq(2,10,2)
+v2 <- seq(12,20,2)
+v3 <- seq(22,30,2)
+M <- rbind(v1, v2, v3)
+M
+```
+
+\vspace{2cm}
+
+b. Extract the second row out of M.
+
+
+\vspace{2cm}
+```{r}
+M[2,]
+```
+
+
+\vspace{2cm}
+c. Extract the element in the third row and second column of M.
+
+\vspace{2cm}
+
+```{r}
+M[3,2]
+```
+\vspace{2cm}
+
+
+## 12. The following code creates a data.frame and then has two different methods for removing the rows with NA values in the column Grade. Explain the difference between the two.
+
+\vspace{2cm}
+
+```{r}
+df <- data.frame(name= c('Alice','Bob','Charlie','Daniel'),
+                 Grade = c(6,8,NA,9))
+
+df[ -which(  is.na(df$Grade) ), ]
+df[  which( !is.na(df$Grade) ), ]
+```
+\vspace{2cm}
+
+
+The first method subtracts the rows that do fulfill a certain condition (grade=NA). The second method selects the rows that do not fulfill that condition.
+\vspace{2cm}
+
+
+## 14. Create and manipulate a list.
+\vspace{2cm}
+
+
+a.Create a list named my.test with elements
+
+
+\vspace{2cm}
+```{r}
+
+my.test <- list(
+x = c(4,5,6,7,8,9,10), y = c(34,35,41,40,45,47,51), slope = 2.82,  p.value = 0.000131)
+my.test
+```
+
+
+\vspace{2cm}
+b. Extract the second element in the list.
+
+
+\vspace{2cm}
+```{r}
+my.test[2]
+```
+
+
+\vspace{2cm}
+c. Extract the element named p.value from the list.
+
+\vspace{2cm}
+
+```{r}
+my.test$p.value
+```
+
+
+\vspace{2cm}
+# Chapter 9 Exercises
+
+## 1. Download from GitHub the data file Example_5.xls. Open it in Excel and figure out which sheet of data we should import into R. At the same time figure out how many initial rows need to be skipped. Import the data set into a data frame and show the structure of the imported data using the str() command. Make sure that your data hasmn = 31 observations and the three columns are appropriately named. If you make any modifications to the data file, comment on those modifications.
+
+\vspace{2cm}
+
+```{r}
+data.1 <- read_excel( 'Example_5.xls', sheet='RawData')
+str(data.1)
+```  
+I removed the metadata from the "RawData" sheet and put in the "Metadata" sheet. I also deleted the rows with cells with spaces but no data.
+
+\vspace{2cm}
+
+## 2. Download from GitHub the data file Example_3.xls. Import the data set into a data frame and show the structure of the imported data using the tail() command which shows the last few rows of a data table. Make sure the Tesla values are NA where appropriate and that both -9999 and NA are imported as NA values. If you make any modifications to the data file, comment on those modifications.
+
+\vspace{2cm}
+
+```{r}
+data.2 <- read_excel( 'Example_3.xls', sheet='data', range="A1:L34", na=c("NA", "-9999"))
+tail(data.2)
+```  
+
+
+
+
